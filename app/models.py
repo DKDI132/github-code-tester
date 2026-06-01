@@ -1,4 +1,4 @@
-from pydantic import BaseModel, model_validator, EmailStr
+from pydantic import BaseModel, EmailStr, model_validator
 
 
 class Register(BaseModel):
@@ -15,3 +15,6 @@ class Register(BaseModel):
 class Login(BaseModel):
     mail:EmailStr
     haslo:str
+
+class Testowe(BaseModel):
+    link:str

@@ -1,7 +1,13 @@
-from app.models import Register,Login
+from app.models import Register,Login,Testowe
 from app.security import hash_haslo,sprawdz_haslo
 import asyncmy
 pool = None
+async def dodaj_do_sprawdzenia(id_klienta:int,link:str):
+    kwerenda = "INSERT INTO repo_tests(user_id,repo_url) values (%s,%s)"
+    status = await execute(kwerenda,(id_klienta,link))
+    if status:
+        return 1
+    return 0
 
 async def udane_logowanie(dane:Login):
     pytanie="SELECT id,haslo from users where email = %s"
