@@ -1,9 +1,13 @@
 import os
+from jose import JWTError, jwt
+from fastapi import HTTPException, status
+
 
 import bcrypt
 from dotenv import load_dotenv
-from jose import jwt
 from datetime import datetime, timedelta, timezone
+
+load_dotenv(".env")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
@@ -26,9 +30,6 @@ def stworz_token(user_id: int):
     )
 
     return token
-from jose import JWTError, jwt
-from fastapi import HTTPException, status
-
 
 def sprawdz_token(token: str):
     try:

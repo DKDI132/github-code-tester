@@ -21,10 +21,10 @@ async def rejestruj(request:Request,dane:Register):
 @router.post("/login")
 async def login(request:Request,dane:Login):
     if not await czy_istnieje(dane.mail):
-        raise HTTPException(422,{"status":"blad","details":"nie ma takiego konta"})
+        raise HTTPException(401,{"status":"blad","details":"nie ma takiego konta"})
     logowanie = await udane_logowanie(dane)
     if logowanie[0] == -1:
-        return HTTPException(401,{"status":"blad","details":"Haslo jest nieprawidlowe"})
+        raise HTTPException(401,{"status":"blad","details":"Haslo jest nieprawidlowe"})
     if logowanie[0] == 0:
         raise HTTPException(500, {"status": "blad","details": "Rejestracja sie nie powiodla z naszej winy, prosze wrocic pozniej"})
     id = logowanie[1]
