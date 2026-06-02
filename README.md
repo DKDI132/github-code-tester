@@ -1,4 +1,4 @@
-# Czat E2E
+# SPRAWDZANIE KODU
 
 Prosty system do kolejkowania i sprawdzania publicznych repozytoriow GitHub. Uzytkownik loguje sie, wysyla link do repozytorium, a osobny worker pobiera kod, uruchamia go w Dockerze i zapisuje wynik testu w bazie.
 
