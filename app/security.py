@@ -49,8 +49,13 @@ def sprawdz_token(token: str):
 
         return int(user_id)
 
-    except JWTError:
+
+    except (JWTError, ValueError):
+
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+
+            status_code=401,
+
             detail={"status": "blad", "details": "nieprawidlowy token"}
+
         )

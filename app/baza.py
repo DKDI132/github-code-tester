@@ -2,6 +2,26 @@ from app.models import Register,Login,Testowe
 from app.security import hash_haslo,sprawdz_haslo
 import asyncmy
 pool = None
+async def zmien_wynik(id:int,wynik:str):
+    kwerenda = "update repo_tests SET result = %s Where id = %s"
+    status = await execute(kwerenda,(wynik,id))
+    return status
+async def zmien_status(id:int,status:str):
+    kwerenda = "UPDATE repo_tests SET status = %s WHERE id = %s"
+    status = await execute(kwerenda,(status,id))
+    return status
+
+async def dodaj_krok(id_testu,kolejnosc,name,command,status,exit_code,stdout,stderr):
+    kwerenda = "INSERT INTO repo_test_steps(repo_test_id,step_order,name,command,status,exit_code,stdout,stderr) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+    status = await execute(kwerenda,(id_testu,kolejnosc,name,command,status,exit_code,stdout,stderr))
+    return status
+async def znajdz_nastepny_do_testu():
+    kwerenda = "SELECT * from repo_tests WHERE status = %s ORDER BY id LIMIT 1"
+    wynik = await fetchall(kwerenda,("czeka",))
+    if wynik:
+        return wynik[0]
+    return None
+
 async def dodaj_do_sprawdzenia(id_klienta:int,link:str):
     kwerenda = "INSERT INTO repo_tests(user_id,repo_url) values (%s,%s)"
     status = await execute(kwerenda,(id_klienta,link))

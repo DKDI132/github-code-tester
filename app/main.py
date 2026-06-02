@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.operator import rout
+from app.obsluga import rout
 from app.system_logowania import router
 from app.baza import create_pool,close_pool
 

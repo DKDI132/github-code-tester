@@ -8,7 +8,7 @@ response = requests.post(
         "Authorization": f"Bearer {token}"
     },
     json={
-        "link": "https://github.com/user/projekt"
+        "link": "https://github.com/DKDI132/pytania-jawne-polski"
     }
 )
 
