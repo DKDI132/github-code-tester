@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 from fastapi.params import Header,Query
-from requests.utils import default_headers
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import JSONResponse

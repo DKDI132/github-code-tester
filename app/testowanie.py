@@ -2,16 +2,16 @@ import asyncio
 import os
 import subprocess
 import stat
-from app.baza import create_pool,znajdz_nastepny_do_testu,dodaj_krok,zmien_status,zmien_wynik
 import shutil
+
+from app.baza import create_pool,znajdz_nastepny_do_testu,dodaj_krok,zmien_status,zmien_wynik
 
 def force_remove_readonly(func, path, exc_info):
     os.chmod(path, stat.S_IWRITE)
     func(path)
 
-folder = f"C:/tmp/repo-tests/job"
-
 async def przeprowadz_testy(dane:tuple):
+    folder = f"C:/tmp/repo-tests/job_{dane[0]}"
     try:
         wyniki = []
 
@@ -40,6 +40,10 @@ async def przeprowadz_testy(dane:tuple):
 
         command = [
             "docker", "run", "--rm",
+            "--memory", "512m",
+            "--cpus", "1",
+            "--pids-limit", "128",
+            "--security-opt", "no-new-privileges",
             "-v", f"{folder}:/repo",
             "-w", "/repo",
             "python:3.12-slim",
@@ -50,6 +54,7 @@ async def przeprowadz_testy(dane:tuple):
             command,
             text=True,
             encoding="utf-8",
+            errors="replace",
             capture_output=True,
             timeout=300
         )
@@ -66,6 +71,16 @@ async def przeprowadz_testy(dane:tuple):
             status = "success"
         await zmien_status(dane[0],"gotowe")
         await zmien_wynik(dane[0],status)
+    except subprocess.TimeoutExpired as e:
+        stdout = e.stdout or ""
+        stderr = e.stderr or "Timeout podczas wykonywania komendy"
+        await dodaj_krok(dane[0],2,"blad workera","timeout","fail",None,stdout,stderr)
+        await zmien_status(dane[0],"gotowe")
+        await zmien_wynik(dane[0],"fail")
+    except Exception as e:
+        await dodaj_krok(dane[0],2,"blad workera","worker exception","fail",None,"",str(e))
+        await zmien_status(dane[0],"gotowe")
+        await zmien_wynik(dane[0],"fail")
     finally:
         if os.path.exists(folder):
             shutil.rmtree(folder,onerror=force_remove_readonly)
@@ -83,4 +98,5 @@ async def main():
             await przeprowadz_testy(job)
         await asyncio.sleep(5)
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

@@ -27,6 +27,31 @@ Prosty system do kolejkowania i sprawdzania publicznych repozytoriow GitHub. Uzy
 
 Docker Desktop musi byc uruchomiony przed startem workera. Sama komenda `docker` jest tylko klientem, a worker potrzebuje dzialajacego Docker Engine.
 
+## Bezpieczenstwo Dockera
+
+Worker uruchamia cudzy kod w kontenerze Docker, a nie bezposrednio na systemie hosta. Kontener jest odpalany z limitami:
+
+```text
+--memory 512m
+--cpus 1
+--pids-limit 128
+--security-opt no-new-privileges
+```
+
+To ogranicza zuzycie RAM, CPU i liczbe procesow oraz blokuje podnoszenie uprawnien w kontenerze.
+
+Wazne: etap `pip install -r requirements.txt` potrzebuje internetu, wiec kontener podczas instalacji zaleznosci ma dostep do sieci. To oznacza, ze zlosliwe zaleznosci nadal moga wykonywac kod w trakcie instalacji i wykonywac requesty sieciowe. Kontener nie ma dostepu do dysku hosta poza zamontowanym folderem tymczasowego repozytorium, ale nie jest to pelny sandbox klasy produkcyjnej.
+
+Nie nalezy dodawac do `docker run`:
+
+```text
+--privileged
+-v /var/run/docker.sock:/var/run/docker.sock
+-v C:\:/host
+```
+
+Docelowo bezpieczniejszy wariant to rozdzielenie etapow: instalacja zaleznosci z siecia, a pozniejsze uruchamianie testow/kompilacji z `--network none`.
+
 ## Konfiguracja
 
 W katalogu projektu utworz plik `.env`:
@@ -255,7 +280,7 @@ Worker wykonuje uproszczony test Python-only:
 python:3.12-slim
 ```
 
-6. w kontenerze wykonuje:
+6. w kontenerze z limitami wykonuje:
 
 ```sh
 if [ -f requirements.txt ]; then pip install -r requirements.txt; fi && python -m compileall .

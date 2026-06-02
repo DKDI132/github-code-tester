@@ -1,17 +1,21 @@
 import json
+from pathlib import Path
 
 import requests
 from config import adres
+
+TOKEN_PATH = Path(__file__).parent / "token.json"
 
 def szczegoly(token,id):
     response = requests.get(
         f"{adres}/api-operacje/szczegoly?id={id}",
         headers={
             "Authorization": f"Bearer {token}"
-        }
+        },
+        timeout=10
 
     )
-    dane = json.loads(response.text)
+    dane = response.json()
     return dane["details"]
 
 
@@ -20,9 +24,10 @@ def lista_testowa(token):
         f"{adres}/api-operacje/wyciagnij",
         headers={
             "Authorization": f"Bearer {token}"
-        }
+        },
+        timeout=10
     )
-    dane = json.loads(response.text)
+    dane = response.json()
     lista=dane["details"]
     lista=list(lista)
     return lista
@@ -35,9 +40,10 @@ def dodaj_do_kolejki(token,link):
         },
         json={
             "link": f"{link}"
-        }
+        },
+        timeout=10
     )
-    dane = json.loads(response.text)
+    dane = response.json()
 
     if response.status_code != 200:
         return dane["detail"]["details"]
@@ -51,13 +57,14 @@ def loguj(mail,haslo):
         json={
             "mail": f"{mail}",
             "haslo":f"{haslo}"
-        }
+        },
+        timeout=10
     )
-    dane = json.loads(response.text)
+    dane = response.json()
     if response.status_code != 200:
         return dane["detail"]["details"]
     token = dane["token"]
-    with open("token.json",'w') as file:
+    with open(TOKEN_PATH,'w', encoding="utf-8") as file:
         json.dump({"token": token}, file)
     return dane["details"]
 
@@ -70,9 +77,10 @@ def rejestruj(mail,haslo,powtorz):
             "mail": f"{mail}",
             "haslo": f"{haslo}",
             "powtorzone":f"{powtorz}"
-        }
+        },
+        timeout=10
     )
-    dane = json.loads(response.text)
+    dane = response.json()
     if response.status_code != 201:
         return dane["detail"]["details"]
     return dane["details"]

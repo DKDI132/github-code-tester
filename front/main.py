@@ -1,7 +1,11 @@
 import sys
 import json
+from pathlib import Path
+
 from requesty import dodaj_do_kolejki,loguj,rejestruj,lista_testowa,szczegoly
 from getpass import getpass
+
+TOKEN_PATH = Path(__file__).parent / "token.json"
 
 def wypisz_szczegoly(informacje):
     if not informacje:
@@ -70,7 +74,7 @@ def wypisz_liste_testow(lista_testow):
 
 def wyjmij_token():
     try:
-        with open("token.json",'r') as file:
+        with open(TOKEN_PATH,'r', encoding="utf-8") as file:
             p=file.read()
             if not p:
                 print("prosze najpierw sie zalogowac -l")
@@ -121,7 +125,14 @@ if a == "-w":
 
     print("Twoje ostatnie testy:\n")
     wypisz_liste_testow(lista_testow)
-    odpowiedz=int(input("Szczegoly ktorego testu chcesz poznac: "))
+    try:
+        odpowiedz=int(input("Szczegoly ktorego testu chcesz poznac: "))
+        if odpowiedz < 1 or odpowiedz > len(lista_testow):
+            print("Nie ma takiego numeru testu")
+            quit()
+    except ValueError:
+        print("Podaj numer testu")
+        quit()
     informacje = szczegoly(token,lista_testow[odpowiedz-1][0])
     wypisz_szczegoly(informacje)
     quit()

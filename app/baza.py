@@ -99,6 +99,7 @@ async def execute(kwerenda:str,arg:tuple):
         async with conn.cursor() as cursor:
             try:
                 await cursor.execute(kwerenda,arg)
-            except:
+            except Exception as e:
+                print(e)
                 return False
             return True
