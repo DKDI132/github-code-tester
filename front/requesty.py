@@ -3,6 +3,18 @@ import json
 import requests
 from config import adres
 
+def szczegoly(token,id):
+    response = requests.get(
+        f"{adres}/api-operacje/szczegoly?id={id}",
+        headers={
+            "Authorization": f"Bearer {token}"
+        }
+
+    )
+    dane = json.loads(response.text)
+    return dane["details"]
+
+
 def lista_testowa(token):
     response = requests.get(
         f"{adres}/api-operacje/wyciagnij",

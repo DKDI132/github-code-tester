@@ -2,7 +2,10 @@ from app.models import Register,Login,Testowe
 from app.security import hash_haslo,sprawdz_haslo
 import asyncmy
 pool = None
-
+async def wyjmij_szczegoly(id:int,id_klienta:int):
+    kwerenda = "SELECT * FROM repo_test_steps inner join repo_tests on repo_test_steps.repo_test_id = repo_tests.id where repo_tests.user_id = %s and repo_tests.id = %s ORDER BY repo_test_steps.step_order"
+    wyniki = await fetchall(kwerenda,(id_klienta,id))
+    return wyniki
 async def wyjmij_testy(id:int):
     kwerenda = "SELECT id,repo_url,status,result from repo_tests where user_id = %s ORDER BY id DESC LIMIT 10"
     wyniki = await fetchall(kwerenda,(id,))

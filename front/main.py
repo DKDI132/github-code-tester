@@ -1,7 +1,72 @@
 import sys
 import json
-from requesty import dodaj_do_kolejki,loguj,rejestruj,lista_testowa
+from requesty import dodaj_do_kolejki,loguj,rejestruj,lista_testowa,szczegoly
 from getpass import getpass
+
+def wypisz_szczegoly(informacje):
+    if not informacje:
+        print("Test jeszcze nie ma krokow albo nie istnieje.")
+        return
+
+    pierwszy = informacje[0]
+
+    test_id = pierwszy[9]
+    repo_url = pierwszy[11]
+    test_status = pierwszy[12]
+    test_result = pierwszy[13] if pierwszy[13] is not None else "brak"
+
+    print("\nSzczegoly testu")
+    print("=" * 60)
+    print(f"ID:     {test_id}")
+    print(f"Repo:   {repo_url}")
+    print(f"Status: {test_status}")
+    print(f"Wynik:  {test_result}")
+    print("=" * 60)
+
+    for step in informacje:
+        step_order = step[2]
+        name = step[3]
+        command = step[4]
+        status = step[5]
+        exit_code = step[6]
+        stdout = step[7] or ""
+        stderr = step[8] or ""
+
+        print(f"\nKrok {step_order}: {name}")
+        print("-" * 60)
+        print(f"Status:    {status}")
+        print(f"Exit code: {exit_code}")
+        print(f"Komenda:   {command}")
+
+        if stdout.strip():
+            print("\nSTDOUT:")
+            print(stdout[:1000])
+
+        if stderr.strip():
+            print("\nSTDERR:")
+            print(stderr[:1000])
+
+        print("-" * 60)
+
+def wypisz_liste_testow(lista_testow):
+    if not lista_testow:
+        print("Nie masz jeszcze zadnych testow.")
+        return
+
+    print("\nTwoje ostatnie testy")
+    print("=" * 60)
+
+    for numer, test in enumerate(lista_testow, start=1):
+        test_id = test[0]
+        link = test[1]
+        status = test[2]
+        wynik = test[3] if test[3] is not None else "brak"
+
+        print(f"{numer}. ID: {test_id}")
+        print(f"   Repo:   {link}")
+        print(f"   Status: {status}")
+        print(f"   Wynik:  {wynik}")
+        print("-" * 60)
 
 def wyjmij_token():
     try:
@@ -55,14 +120,8 @@ if a == "-w":
         quit()
 
     print("Twoje ostatnie testy:\n")
-
-    for numer, test in enumerate(lista_testow, start=1):
-        test_id = test[0]
-        link = test[1]
-        status = test[2]
-        wynik = test[3] if test[3] is not None else "-"
-
-        print(f"{numer}. [{status}/{wynik}] ID {test_id}")
-        print(f"   {link}")
-
+    wypisz_liste_testow(lista_testow)
+    odpowiedz=int(input("Szczegoly ktorego testu chcesz poznac: "))
+    informacje = szczegoly(token,lista_testow[odpowiedz-1][0])
+    wypisz_szczegoly(informacje)
     quit()

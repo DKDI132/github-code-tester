@@ -13,7 +13,6 @@ folder = f"C:/tmp/repo-tests/job"
 
 async def przeprowadz_testy(dane:tuple):
     try:
-        print(dane)
         wyniki = []
 
         await zmien_status(dane[0],"w_trakcie")
