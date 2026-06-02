@@ -2,6 +2,12 @@ from app.models import Register,Login,Testowe
 from app.security import hash_haslo,sprawdz_haslo
 import asyncmy
 pool = None
+
+async def wyjmij_testy(id:int):
+    kwerenda = "SELECT id,repo_url,status,result from repo_tests where user_id = %s ORDER BY id DESC LIMIT 10"
+    wyniki = await fetchall(kwerenda,(id,))
+    return wyniki
+
 async def zmien_wynik(id:int,wynik:str):
     kwerenda = "update repo_tests SET result = %s Where id = %s"
     status = await execute(kwerenda,(wynik,id))
